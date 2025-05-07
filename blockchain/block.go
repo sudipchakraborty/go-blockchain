@@ -9,31 +9,31 @@ type Block struct{
 
 	Timestamp time.Time
 	Transaction [] *Transaction
-	PreBlockHash []byte
+	PrevBlockHash []byte
 	Hash []byte
 	validator []byte // validator's public key
 	Nonce int
 }
 //___________________________________________________________________________________________
-func NewBlock(transactions []*Transaction, prevBlockHash []byte, validator []byte) *Block(
+func NewBlock(transactions []*Transaction, prevBlockHash []byte, validator []byte) *Block{
 	block :=&Block{
-		Timestamp:time.now(),
+		Timestamp:time.Now(),
 		Transactions: transactions,
-		PrevBlockchain:prevBlockchain,
-		validator:validator
+		prevBlockHash:prevBlockHash,
+		validator:validator,
 	}
 	block.Hash=block.calculateHash()
 	return block
-)
+}
 //___________________________________________________________________________________________
 //calculateHash(): generate the hash of the block
 func (b *Block) calculateHash() []byte{
 	var txHashes []byte
 	for _,tx:= range b.Transactions{
-		txHashes=append(txHashes,tx.Hash()...)
+		txHashes=append(txHashes,tx.hashTransaction()...)
 	}
 	hash:=sha256.Sum256(bytes.Join([][]byte{
-		b.prevBlockHash,
+		b.PrevBlockHash,
 		txHashes,
 		[]byte(b.Timestamp.Staring()),
 	}, []byte{} ))
@@ -55,14 +55,14 @@ if err:= nil{
 }
 //___________________________________________________________________________________________
 // serialize() converts a block into a byte slice for storage
-func (b *Block) serialize() []byte{
-var result bytes.Buffer
-encoder := gob.NewEncoder(&result)
-
+func  DeserializeBlock(data []byte)  *Block{
+var block Block
+decoder := gob.NewDecoder(bytes.NewReader(data))
 // if there is an error
-err := encoder.Encode(b)
+err := encoder.Decode(&block)
 if err:=nil{
 	panic(err)
 }
+	return &block
 }
 //___________________________________________________________________________________________
